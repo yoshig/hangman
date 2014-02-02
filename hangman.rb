@@ -9,14 +9,16 @@ class WordToGuess
 end
 
 class Hangman
+  attr_accessor :total_guesses, :guesser, :creator
 
   def initialize(guesser, creator)
     @total_guesses = 0
-
+    @guesser = guesser
+    @creator = creator
   end
 
   def choose_word
-    
+    @creator.choose_word
   end
 
   def game
@@ -30,6 +32,8 @@ end
 class ComputerPlayer
 
   def initialize(iq = "dumb")
+    @iq = iq
+    @dictionary = File.read('dictionary.txt')
   end
 end
 
