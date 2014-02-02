@@ -54,7 +54,7 @@ class HangMan
   end
 
   def tell_word
-    puts "The word was #{@creator.secret_word}"
+    puts "The word was #{@creator.final}"
   end
 
   def valid?(letter)
@@ -72,7 +72,7 @@ end
 
 class HumanPlayer
   attr_accessor :name, :blanks
-  attr_reader :secret_word
+  attr_reader :final
 
   def initialize(name)
     @name = name
@@ -80,9 +80,9 @@ class HumanPlayer
 
   def create_word
     puts "What word would you like the guesser to guess?"
-    @secret_word = gets.chomp.downcase
+    @final = gets.chomp.downcase
     @blanks = @secret_word.split(//).map { |space| "_" }
-    @secret_word
+    @secret_word = @final
   end
 
   def guess(_)
@@ -116,7 +116,7 @@ end
 
 class ComputerPlayer
   attr_accessor :name, :blanks
-  attr_reader :secret_word
+  attr_reader :final
 
   def initialize(name, iq = "dumb")
     @name = name
@@ -129,9 +129,10 @@ class ComputerPlayer
   end
 
   def create_word
-    @secret_word = @dictionary.sample.split(//)
-    @blanks = @secret_word.map { "_" }
-    @secret_word.join
+    @final = @dictionary.sample.split(//)
+    @blanks = @final.map { "_" }
+    @secret_word = @final
+    @final.join
   end
 
   def say_good_guess?(guess_letter)
@@ -150,7 +151,7 @@ class ComputerPlayer
   end
 
   def lost?
-    @blanks.any? { |x| x != "_" }
+    @blanks.all? { |x| x != "_" }
   end
 
   def guess(hidden_word)
