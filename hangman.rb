@@ -1,8 +1,9 @@
 class OfficialWord
 
-  attr_accessor :uncovered, :covered
+  attr_accessor :uncovered, :covered, :final
 
   def initialize(word)
+    @final = word
     @uncovered = word.split(//)
     @covered = @uncovered.map { |letter| "_" }
   end
@@ -91,7 +92,7 @@ class HangMan
   end
 
   def tell_word
-    puts "The word was #{@hidden_word}"
+    puts "The word was #{@hidden_word.final}"
   end
 
   def valid?(letter)
@@ -131,7 +132,7 @@ class ComputerPlayer
     if @iq == "dumb"
       ("a".."z").to_a.sample
     else
-      #Put intelligent guesses here
+
     end
   end
 end
@@ -139,7 +140,7 @@ end
 
 comp = ComputerPlayer.new
 me = HumanPlayer.new
-new_game = HangMan.new(me, me)
+new_game = HangMan.new(comp, comp)
 new_game.game
 
 word = OfficialWord.new("hat")
