@@ -13,7 +13,7 @@ class HangMan
     @dictionary.map! { |word| word.chomp }
   end
 
-  def creator_creates
+  def creator_creates_word
     word_entry = ""
     until @dictionary.include?(word_entry)
       word_entry = @creator.create_word
@@ -24,7 +24,7 @@ class HangMan
   end
 
   def game
-    creator_creates
+    creator_creates_word
 
     until @total_guesses == 0
 
@@ -32,14 +32,7 @@ class HangMan
       puts "Already guessed: #{@guessed_letters}"
       show_board
 
-      current_guess = ""
-      until valid?(current_guess)
-        current_guess = guesser.guess(@creator.blanks)
-        unless valid?(current_guess)
-          puts "Guess is not valid"
-        end
-      end
-
+      current_guess = get_valid_letter
       @guessed_letters << current_guess
       @total_guesses -= 1 unless @creator.say_good_guess?(current_guess)
 
@@ -51,6 +44,17 @@ class HangMan
 
     puts "#{creator.name} wins"
     tell_word
+  end
+
+  def get_valid_letter
+    current_guess = ""
+    until valid?(current_guess)
+      current_guess = guesser.guess(@creator.blanks)
+      unless valid?(current_guess)
+        puts "Guess is not valid"
+      end
+    end
+    current_guess
   end
 
   def tell_word
