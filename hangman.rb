@@ -71,7 +71,7 @@ class HangMan
 
       current_guess = ""
       until valid?(current_guess)
-        current_guess = guesser.guess
+        current_guess = guesser.guess(@hidden_word.covered)
         unless valid?(current_guess)
           puts "Guess is not valid"
         end
@@ -110,7 +110,7 @@ class HumanPlayer
     gets.chomp.downcase
   end
 
-  def guess
+  def guess(_)
     puts "Guess a letter"
     gets.chomp.downcase
   end
@@ -122,23 +122,56 @@ class ComputerPlayer
 
     @dictionary = File.readlines('dictionary.txt')
     @dictionary.map! { |word| word.chomp }
+
+    @guessed_letters = []
   end
 
   def create_word
     x = @dictionary.sample
   end
 
-  def guess
+  def guess(hidden_word)
     if @iq == "dumb"
       ("a".."z").to_a.sample
     else
-
+      find_right_length(hidden_word)
+      choose_best_letter
+      choose_best_letter
     end
+  end
+
+  def find_right_length(hidden_word)
+    @dictionary.keep_if do |word|
+      word.length == hidden_word.length
+    end
+  end
+
+  def choose_best_letter
+    best_letters = Hash.new(0)
+
+    @dictionary.each do |word|
+      word.split(//).each do |letter|
+        best_letters[letter] += 1
+      end
+    end
+
+    best_guess_total = 0
+    best_guess = ""
+
+    best_letters.each do |letter, total|
+      if total > best_guess_total && !@guessed_letters.include?(letter)
+        best_guess = letter
+        best_guess_total = total
+      end
+    end
+
+    @guessed_letters << best_guess
+    best_guess
   end
 end
 
 
-comp = ComputerPlayer.new
+comp = ComputerPlayer.new("smart")
 me = HumanPlayer.new
 new_game = HangMan.new(comp, comp)
 new_game.game
