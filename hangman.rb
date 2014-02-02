@@ -54,7 +54,7 @@ class HangMan
   end
 
   def tell_word
-    puts "The word was #{@creator.final}"
+    puts "The word was #{@creator.final.join}"
   end
 
   def valid?(letter)
@@ -81,8 +81,8 @@ class HumanPlayer
   def create_word
     puts "What word would you like the guesser to guess?"
     @final = gets.chomp.downcase
-    @blanks = @secret_word.split(//).map { |space| "_" }
-    @secret_word = @final
+    @blanks = @final.split(//).map { |space| "_" }
+    @secret_word = @final.dup
   end
 
   def guess(_)
@@ -131,7 +131,7 @@ class ComputerPlayer
   def create_word
     @final = @dictionary.sample.split(//)
     @blanks = @final.map { "_" }
-    @secret_word = @final
+    @secret_word = @final.dup
     @final.join
   end
 
@@ -159,7 +159,7 @@ class ComputerPlayer
       ("a".."z").to_a.sample
     else
       find_right_length(hidden_word)
-      choose_best_letter
+      narrow_by_guessed_letters
       choose_best_letter
     end
   end
@@ -167,6 +167,15 @@ class ComputerPlayer
   def find_right_length(hidden_word)
     @dictionary.keep_if do |word|
       word.length == hidden_word.length
+    end
+  end
+
+  def narrow_by_guessed_letters
+    @dictionary.delete_if do |word|
+      word.split(//).each do |letter|
+        return true if @guessed_letters.include?(letter)
+      end
+      false
     end
   end
 
