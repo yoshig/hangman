@@ -58,7 +58,7 @@ class HangMan
   end
 
   def valid?(letter)
-    ("a".."z").include?(letter) && not_guessed?(letter)
+    (("a".."z").include?(letter) || letter == "-") && not_guessed?(letter)
   end
 
   def not_guessed?(letter)
@@ -126,6 +126,7 @@ class ComputerPlayer
     @dictionary.map! { |word| word.chomp }
 
     @guessed_letters = []
+    @final = ""
   end
 
   def create_word
@@ -160,6 +161,7 @@ class ComputerPlayer
     else
       find_right_length(hidden_word)
       narrow_by_guessed_letters
+      narrow_by_right_letter_right_spot(hidden_word)
       choose_best_letter
     end
   end
@@ -173,9 +175,22 @@ class ComputerPlayer
   def narrow_by_guessed_letters
     @dictionary.delete_if do |word|
       word.split(//).each do |letter|
-        return true if @guessed_letters.include?(letter)
+        return true if @guessed_letters.include?(letter) &&
+          !@final.include?(letter)
       end
       false
+    end
+  end
+
+  def narrow_by_right_letter_right_spot(hidden_word)
+    @dictionary.keep_if do |word|
+      keep = true
+      hidden_word.each_with_index do |letter, index|
+        next if letter == "_"
+        keep = false if letter != word[index] ||
+          word.count(letter) != hidden_word.count(letter)
+      end
+      keep
     end
   end
 
@@ -204,7 +219,8 @@ class ComputerPlayer
 end
 
 
-comp = ComputerPlayer.new("iSmart", "smart")
+cp1 = ComputerPlayer.new("guesser", "smart")
+cp2 = ComputerPlayer.new("creator", "smart")
 me = HumanPlayer.new("Yoshi")
-new_game = HangMan.new(comp, comp)
+new_game = HangMan.new(cp1, cp2)
 new_game.game
