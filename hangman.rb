@@ -58,10 +58,11 @@ class HangMan
   end
 
   def tell_word
-    puts "The word was #{@creator.final.join}"
+    puts "The word was #{@creator.show_end_word}"
   end
 
   def valid?(letter)
+    puts letter
     (("a".."z").include?(letter) || letter == "-") && not_guessed?(letter)
   end
 
@@ -76,7 +77,7 @@ end
 
 class HumanPlayer
   attr_accessor :name, :blanks
-  attr_reader :final
+  attr_reader :show_end_word
 
   def initialize(name)
     @name = name
@@ -84,9 +85,9 @@ class HumanPlayer
 
   def create_word
     puts "What word would you like the guesser to guess?"
-    @final = gets.chomp.downcase
-    @blanks = @final.split(//).map { |space| "_" }
-    @secret_word = @final.dup
+    @show_end_word = gets.chomp.downcase
+    @blanks = @show_end_word.split(//).map { |space| "_" }
+    @secret_word = @show_end_word.dup
   end
 
   def guess(_)
@@ -120,7 +121,7 @@ end
 
 class ComputerPlayer
   attr_accessor :name, :blanks
-  attr_reader :final
+  attr_reader :show_end_word
 
   def initialize(name, iq = "dumb")
     @name = name
@@ -130,14 +131,13 @@ class ComputerPlayer
     @dictionary.map! { |word| word.chomp }
 
     @guessed_letters = []
-    @final = ""
+    @show_end_word = ""
   end
 
   def create_word
-    @final = @dictionary.sample.split(//)
-    @blanks = @final.map { "_" }
-    @secret_word = @final.dup
-    @final.join
+    @secret_word = @dictionary.sample.split(//)
+    @blanks = @secret_word.map { "_" }
+    @show_end_word = @secret_word.join
   end
 
   def say_good_guess?(guess_letter)
@@ -180,7 +180,7 @@ class ComputerPlayer
     @dictionary.delete_if do |word|
       word.split(//).each do |letter|
         return true if @guessed_letters.include?(letter) &&
-          !@final.include?(letter)
+          !@show_end_word.include?(letter)
       end
       false
     end
