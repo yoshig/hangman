@@ -23,14 +23,18 @@ class OfficialWord
   end
 
   def found?
-    covered.any? { |x| "_" }
+    @uncovered.all? { |x| x == "_" }
+  end
+
+  def current_state
+    puts @covered.join(' ')
   end
 end
 
 class HangMan
   attr_accessor :total_guesses, :guesser, :creator
 
-  def initialize(guesser, creator, total_guesses = 10)
+  def initialize(guesser, creator, total_guesses = 6)
     @total_guesses = total_guesses
 
     @guesser = guesser
@@ -45,9 +49,9 @@ class HangMan
 
   def creator_creates
     word_entry = ""
-    until dictionary.include?(word_entry)
-      @hidden_word = @creator.create_word
-      unless dictionary.include?(word_entry)
+    until @dictionary.include?(word_entry)
+      word_entry = @creator.create_word
+      unless @dictionary.include?(word_entry)
         puts "That's not a real word (according to our dictionary)." 
       end
     end
@@ -55,28 +59,26 @@ class HangMan
     @hidden_word = OfficialWord.new(word_entry)
   end
 
-  def game(creator_creates)
+  def game
+    creator_creates
+
     until @total_guesses == 0 || @hidden_word.found?
 
       puts "You have #{@total_guesses} guesses left"
-      puts "Already guessed: #{guessed_letters}"
-      p @hidden_word
+      puts "Already guessed: #{@guessed_letters}"
+      @hidden_word.current_state
 
       current_guess = ""
       until valid?(current_guess)
-        current_guess = player.guess
+        current_guess = guesser.guess
         unless valid?(current_guess)
           puts "Guess is not valid"
         end
       end
 
-      guessed_letters << current_guess
+      @guessed_letters << current_guess
+      @total_guesses -= 1 unless @hidden_word.good_guess?(current_guess)
 
-      if good_guess?(current_guess)
-        @hidden_word.uncover(current_guess)
-      else
-        @total_guesses -= 1
-      end
     end
 
     if @hidden_word.found?
@@ -93,11 +95,11 @@ class HangMan
   end
 
   def valid?(letter)
-    ("A".."Z").include?(letter) && not_guessed?(letter)
+    ("a".."z").include?(letter) && not_guessed?(letter)
   end
 
   def not_guessed?(letter)
-    already_guessed.include?(letter)
+    !@guessed_letters.include?(letter)
   end
 end
 
@@ -108,6 +110,8 @@ class HumanPlayer
   end
 
   def guess
+    puts "Guess a letter"
+    gets.chomp.downcase
   end
 end
 
@@ -120,7 +124,7 @@ class ComputerPlayer
   end
 
   def create_word
-    @dictionary.sample
+    x = @dictionary.sample
   end
 
   def guess
@@ -135,4 +139,8 @@ end
 
 comp = ComputerPlayer.new
 me = HumanPlayer.new
-new_game = HangMan.new(me, comp)
+new_game = HangMan.new(me, me)
+new_game.game
+
+word = OfficialWord.new("hat")
+word.good_guess?("w")
