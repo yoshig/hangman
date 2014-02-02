@@ -1,14 +1,35 @@
-class WordToGuess(word)
-  @uncovered = word.split()
-  @covered = 
+class WordToGuess
+
+  attr_accessor :uncovered, :covered
+
+  def initialize(word)
+    @uncovered = word.split(//)
+    @covered = @uncovered.map { |letter| "_" }
+  end
 end
 
-class Hangman(player1, player2)
+class Hangman
 
+  def initialize(guesser, creator)
+    @total_guesses = 0
+
+  end
+
+  def choose_word
+    
+  end
+
+  def game
+
+  end
 end
 
 class HumanPlayer
 end
 
-class ComputerPlayer(iq = "dumb")
+class ComputerPlayer
+
+  def initialize(iq = "dumb")
+  end
 end
+
